@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="/index.js"></script>
+  <style>
+    .drog {
+      width: 800px;
+      height: 500px;
+      line-height: 500px;
+      margin: 100px auto;
+      border: 5px dashed #ccc;
+      text-align: center;
+    }
+    .drag-item {
+      height: 40px;
+      line-height: 40px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="drog">
+    <div id="drag_tips">拖拽到这里</div>
+    <ul class="drag-list" id="drag_list">
+
+    </ul>
+  </div>
+  <script>
+    (() => {
+      const dom = document.querySelector('.drog');
+      const dragTips = document.querySelector('#drag_tips');
+      const dragList = document.querySelector('#drag_list');
+
+      dom.addEventListener('dragover', (e) => {
+        e.stopPropagation();
+
+        e.preventDefault();
+      })
+
+      dom.addEventListener('drop', async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const files = getFiles.default(e).then((res) => {
+          console.log(res);
+          if (res.fileList.length > 0) {
+            let str = '';
+            dragTips.style.display = 'none';
+            dragList.style.display = 'block';
+
+            for (const item of res.fileList) {
+              if (Object.prototype.toString.call(item) === '[object Array]') {
+                const fileName = (item[0].path || item[0].webkitRelativePath || '').split('/')[0];
+
+                str += `<li class="drag-item">
+                  <span class="drag-item--name">${fileName}/</span>
+                  <span class="drag-item--size">${item.length}个文件</span>
+                </li>`
+              } else {
+                str += `<li class="drag-item">
+                  <span class="drag-item--name">${item.name}</span>
+                  <span class="drag-item--size">${item.size}</span>
+                </li>`
+              }
+            }
+
+            dragList.innerHTML = str;
+          }
+        }, (err) => {
+          console.log(err);
+        });
+      })
+    })()
+  </script>
+</body>
+</html>
